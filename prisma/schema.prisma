@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  id Int @id @default(autoincrement())
+  username String @unique
+  password String
+  email String @unique
+  address String?
+  cart Cart[]
+  order Order[]
+}
+
+model Product{
+  id Int @id @default(autoincrement())
+  name String @unique
+  description String
+  price Int
+  quantity Int
+  cart Cart[]
+  order Order[]
+  category Category @relation(fields: [category_id], references: [id])
+  category_id Int
+}
+
+model Category{
+  id Int @id @default(autoincrement())
+  name String
+  product Product[]
+}
+
+model Cart{
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id Int
+  quantity Int
+  product Product @relation(fields: [product_id], references: [id])
+  product_id Int 
+}
+
+model Order{
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [user_id],references: [id])
+  user_id Int
+  product Product @relation(fields: [product_id], references: [id])
+  product_id Int
+  completed Boolean @default(false)
+  created_at DateTime @default(now())
+}
