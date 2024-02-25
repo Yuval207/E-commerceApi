@@ -50,8 +50,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// app.use(authenticateJwt);
-
 app.get("/products", authenticateJwt, async (req, res) => {
   try {
     const products = await prisma.product.findMany({
@@ -140,7 +138,7 @@ app.post("/order/:productId", authenticateJwt, async (req, res) => {
     const productId = Number(req.params.productId);
 
     const userId = req.user.id;
-    // Check if the product quantity is available
+
     const product = await prisma.product.findUnique({
       where: {
         id: productId,
@@ -149,7 +147,7 @@ app.post("/order/:productId", authenticateJwt, async (req, res) => {
     if (!product || product.quantity < 1) {
       return res.status(400).json({ message: "Product out of stock" });
     }
-    // TODO handle concurrency
+
     await prisma.product.update({
       where: {
         id: productId,
@@ -160,7 +158,7 @@ app.post("/order/:productId", authenticateJwt, async (req, res) => {
         },
       },
     });
-    // Place the order
+
     const order = await prisma.order.create({
       data: {
         user_id: userId,
@@ -256,7 +254,7 @@ app.delete("/cart", authenticateJwt, async (req, res) => {
 
 app.get("/orders", authenticateJwt, async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming userId is available in req.body
+    const userId = req.user.id;
     const orders = await prisma.order.findMany({
       where: {
         user_id: userId,
